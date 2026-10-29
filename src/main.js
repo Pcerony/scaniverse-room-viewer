@@ -20,6 +20,7 @@ import {
   Accessibility,
   Baby,
   PersonStanding,
+  CircleHelp, Keyboard, Mouse, Move, Hand, ArrowRight,
 } from "lucide";
 import objUrl from "../Scaniverse 2026-10-13 210522/Scaniverse_2026_10_13_210522.obj?url";
 import mtlSource from "../Scaniverse 2026-10-13 210522/Scaniverse_2026_10_13_210522.mtl?raw";
@@ -56,6 +57,7 @@ const icons = {
   Accessibility,
   Baby,
   PersonStanding,
+  CircleHelp, Keyboard, Mouse, Move, Hand, ArrowRight,
 };
 $("presets").innerHTML = PRESETS.map(
   (p) =>
@@ -118,6 +120,25 @@ const input = bindInput({
     state.pitch = THREE.MathUtils.clamp(state.pitch - dy * 0.003, -1.35, 1.35);
   },
 });
+const tutorial = $("tutorial");
+function selectGuide(mobile) {
+  $("desktop-guide").hidden = mobile;
+  $("mobile-guide").hidden = !mobile;
+  $("guide-desktop").setAttribute("aria-pressed", String(!mobile));
+  $("guide-mobile").setAttribute("aria-pressed", String(mobile));
+}
+function showGuide() {
+  input.clear();
+  if (document.pointerLockElement) document.exitPointerLock();
+  selectGuide(matchMedia("(pointer: coarse)").matches || innerWidth <= 700);
+  tutorial.showModal();
+  $("start-guide").focus();
+}
+$("guide-desktop").onclick = () => selectGuide(false);
+$("guide-mobile").onclick = () => selectGuide(true);
+$("help").onclick = showGuide;
+$("start-guide").onclick = () => tutorial.close();
+tutorial.addEventListener("close", () => { input.clear(); viewport.focus({ preventScroll: true }); });
 
 function walkCamera() {
   camera.position.set(state.x, state.floor + state.height, state.z);
@@ -327,6 +348,7 @@ async function start() {
   buttons.forEach((b) => (b.disabled = false));
   loadProgress.stage(100);
   $("loading").hidden = true;
+  showGuide();
   let last = performance.now();
   renderer.setAnimationLoop((now) => {
     const dt = Math.min((now - last) / 1000, 0.04);
