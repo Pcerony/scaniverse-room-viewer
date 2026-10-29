@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.superpowers/
+.playwright-cli/
+output/
+.DS_Store
